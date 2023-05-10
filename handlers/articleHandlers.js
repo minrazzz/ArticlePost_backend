@@ -1,6 +1,5 @@
 const { ArticleModel } = require("../models/Article");
-const fs = require("fs");
-const path = require("path"); //to get the extension of the filename
+const { imageValidation, imageUpload } = require("../middleware/authenticate");
 
 const getArticles = async (req, res) => {
   try {
@@ -12,48 +11,25 @@ const getArticles = async (req, res) => {
     console.log(error);
   }
 };
-
 //we use express file-upload lib for file upload
 const addArticle = async (req, res) => {
   try {
     const body = req.body;
     const imageFile = req.files.image;
-    const hashedFileName = imageFile.md5;
-
-    //to get the extension of image file
-    const extension = path.extname(imageFile.name);
+    console.log(imageFile.mimetype);
 
     //mimetype describes file-type example "image/jpeg"
-    if (!imageFile.mimetype.startsWith("image")) {
-      res.json({
-        success: false,
-        message: "Invalid file-type",
-      });
+    if (!imageValidation(imageFile.mimetype, res)) {
       return false;
     }
-
     //:we use existsSync to check whether the require folder exists
-    if (!fs.existsSync("uploads")) {
-      fs.mkdirSync("uploads");
-    }
-
-    imageFile.mv(
-      "uploads/" + Date.now() + hashedFileName + extension,
-      function (err) {
-        if (err) {
-          res.json({
-            success: false,
-            message: "something went wrong",
-          });
-        }
-      }
-    );
+    const imageFileName = imageUpload("uploads", imageFile);
 
     const article = new ArticleModel({
       title: body.title,
       description: body.description,
       author: body.author,
-      image: "uploads/" + imageFile.name,
+      image: "uploads/" + imageFileName,
     });
 
     article.save();
@@ -64,8 +40,34 @@ const addArticle = async (req, res) => {
   } catch (error) {}
 };
 
-const editArticle = (req, res) => {
+//Edit_Article
+const editArticle = async (req, res) => {
   try {
+    let imageFileName = null;
+    const id = req.params.id;
+    const body = req.body;
+
+    if (req.files) {
+      const imageFile = req.files.image;
+      if (!imageValidation(imageFile.mimetype, res)) {
+        return false;
+      }
+      imageFileName = imageUpload("uploads", imageFile);
+    }
+
+    const edit = await ArticleModel.findByIdAndUpdate(
+      { _id: id },
+      {
+        title: body.title,
+        description: body.description,
+        author: body.author,
+        image: imageFileName ? "uploads/" + imageFileName : null,
+      }
+    );
+    res.json({
+      success: true,
+      message: "Article created succesfully",
+    });
   } catch (error) {
     console.log(error);
   }

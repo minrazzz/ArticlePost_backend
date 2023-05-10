@@ -5,7 +5,11 @@ require("./database/Connection");
 require("dotenv").config();
 
 const { getUsers, addUser, loginUser } = require("./handlers/userHandlers");
-const { getArticles, addArticle } = require("./handlers/articleHandlers");
+const {
+  getArticles,
+  addArticle,
+  editArticle,
+} = require("./handlers/articleHandlers");
 const { authToken } = require("./middleware/authenticate");
 
 app.use(express.json());
@@ -22,7 +26,7 @@ app.post("/user/login", loginUser);
 // articlehandlers
 app.get("/article", getArticles);
 app.post("/article/add", addArticle);
-app.put("/article/edit:id", addArticle);
+app.put("/article/edit/:id", editArticle);
 
 try {
   app.listen(process.env.PORT, function () {
