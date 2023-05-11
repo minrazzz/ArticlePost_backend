@@ -50,8 +50,8 @@ const addUser = async (req, res) => {
     const OTPvalue = generateOTP();
     user.save();
 
-    res.json({
-      sucess: true,
+    return res.json({
+      success: true,
       message: "user added succesfully",
     });
   } catch (error) {
