@@ -72,9 +72,19 @@ const editArticle = async (req, res) => {
     console.log(error);
   }
 };
+const deleteArticle = async (req, res) => {
+  const id = req.params.id;
+
+  const deleteArticle = await ArticleModel.findByIdAndRemove({ _id: id }); //find by id and remove
+  res.json({
+    success: true,
+    message: "Article created succesfully",
+  });
+};
 
 module.exports = {
   getArticles,
   addArticle,
   editArticle,
+  deleteArticle,
 };

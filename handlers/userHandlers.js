@@ -38,10 +38,21 @@ const addUser = async (req, res) => {
       password: body.password,
     });
 
+    const exists = await userModel.findOne({ email: body.email });
+    if (exists) {
+      res.json({
+        success: false,
+        message: "Email already exist",
+      });
+      return false;
+    }
+
+    const OTPvalue = generateOTP();
+    user.save();
+
     res.json({
       sucess: true,
       message: "user added succesfully",
-      otp: OTPvalue,
     });
   } catch (error) {
     console.log(error);
@@ -84,8 +95,40 @@ const loginUser = async (req, res) => {
   });
 };
 
+//PAtch-Api
+const changePassword = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    const user = await userModel.findOne({ _id: id });
+
+    const result = await user.comparePassword(body.old_password);
+
+    if (!result) {
+      res.json({
+        success: false,
+        message: "Old password is wrong",
+        user,
+      });
+      return false;
+    }
+
+    user.password = body.new_password;
+    user.save();
+    console.log(user);
+
+    res.json({
+      sucess: true,
+      message: "password changed successfully",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getUsers,
   addUser,
   loginUser,
+  changePassword,
 };
