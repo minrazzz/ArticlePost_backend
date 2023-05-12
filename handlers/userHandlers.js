@@ -47,7 +47,7 @@ const addUser = async (req, res) => {
       return false;
     }
 
-    const OTPvalue = generateOTP();
+    // const OTPvalue = generateOTP();
     user.save();
 
     return res.json({
@@ -82,12 +82,18 @@ const loginUser = async (req, res) => {
     return false;
   }
 
-  const token = createToken({ data: user });
+  const token = createToken({
+    data: {
+      name: user.name,
+      email: user.email,
+    },
+  });
   user.token = token;
   await user.save();
+  res.cookie("auth ", token);
 
   res.json({
-    sucess: true,
+    success: true,
     message: "Login successfully",
     data: {
       token,
@@ -115,10 +121,10 @@ const changePassword = async (req, res) => {
 
     user.password = body.new_password;
     user.save();
-    console.log(user);
+    // console.log(user);
 
     res.json({
-      sucess: true,
+      success: true,
       message: "password changed successfully",
     });
   } catch (error) {

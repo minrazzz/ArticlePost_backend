@@ -4,6 +4,7 @@ const fileUpload = require("express-fileupload");
 require("./database/Connection");
 require("dotenv").config();
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const {
   getUsers,
@@ -19,10 +20,11 @@ const {
 } = require("./handlers/articleHandlers");
 const { authToken } = require("./middleware/authenticate");
 
+app.use(cors({ credentials: true, origin: " http://localhost:5173" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-app.use(cors());
+app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads")); //to fetch the static imagen sdfdsklfj
 
