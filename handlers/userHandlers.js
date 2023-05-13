@@ -1,6 +1,6 @@
 let otp = "";
 const { userModel } = require("../models/User");
-const { createToken } = require("../utils");
+const { createToken, verifyToken } = require("../utils");
 
 const generateOTP = () => {
   for (let i = 1; i <= 6; i++) {
@@ -48,7 +48,7 @@ const addUser = async (req, res) => {
     }
 
     // const OTPvalue = generateOTP();
-    user.save();
+    await user.save();
 
     return res.json({
       success: true,
@@ -132,9 +132,28 @@ const changePassword = async (req, res) => {
   }
 };
 
+const getProfileInfo = async (req, res) => {
+  try {
+    const token = req.body.token;
+    if (!token)
+      res.json({
+        success: false,
+        message: "user not found",
+      });
+    const tokenInfo = await verifyToken(token);
+    return res.json({
+      success: true,
+      data: tokenInfo.data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getUsers,
   addUser,
   loginUser,
   changePassword,
+  getProfileInfo,
 };

@@ -2,20 +2,28 @@ const fs = require("fs");
 const path = require("path"); //to get the extension of the filename
 var jwt = require("jsonwebtoken");
 const { verifyToken } = require("../utils");
+const { userModel } = require("../models/User");
 
 module.exports = {
-  authToken: function (req, res, next) {
+  authToken: async function (req, res, next) {
     try {
-      const token =
-        req.body.token || req.query.token || req.headers["x-access-token"];
+      // console.log("auth", req.cookies.auth);
+      const token = req.cookies.auth;
       if (!token) {
         return res.send("Access denied");
       }
 
       const tokenInfo = verifyToken(token);
+      // console.log(tokenInfo.data);
+      const user = await userModel.findOne({
+        email: tokenInfo.data.email,
+        token: token,
+      });
+      if (!user) res.send("Access denied!!");
       next();
     } catch (error) {
       console.log(error);
+      res.send("invalid token");
     }
   },
 

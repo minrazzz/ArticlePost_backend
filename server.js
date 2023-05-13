@@ -6,18 +6,24 @@ require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+//UserHAndlers
 const {
   getUsers,
   addUser,
   loginUser,
   changePassword,
+  getProfileInfo,
 } = require("./handlers/userHandlers");
+
+//Article handlers
 const {
   getArticles,
   addArticle,
   editArticle,
   deleteArticle,
 } = require("./handlers/articleHandlers");
+
+//middleware
 const { authToken } = require("./middleware/authenticate");
 
 app.use(cors({ credentials: true, origin: " http://localhost:5173" }));
@@ -33,14 +39,17 @@ app.get("/user", authToken, getUsers);
 app.post("/user/add", addUser);
 app.post("/user/login", loginUser);
 
+//token_info
+app.post("/profile_info", authToken, getProfileInfo);
+
 //password change
 app.patch("/user/change-password/:id", changePassword);
 
 // articlehandlers
-app.get("/article", getArticles);
-app.post("/article/add", addArticle);
-app.put("/article/edit/:id", editArticle);
-app.delete("/article/delete/:id", deleteArticle);
+app.get("/article", authToken, getArticles);
+app.post("/article/add", authToken, addArticle);
+app.put("/article/edit/:id", authToken, editArticle);
+app.delete("/article/delete/:id", authToken, deleteArticle);
 
 try {
   app.listen(process.env.PORT, function () {
