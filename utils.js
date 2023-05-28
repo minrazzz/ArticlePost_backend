@@ -4,7 +4,7 @@ require("dotenv").config();
 module.exports = {
   createToken: function (payload) {
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-      expiresIn: "12h",
+      expiresIn: "52h",
     });
     return token;
   },

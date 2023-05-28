@@ -8,18 +8,21 @@ module.exports = {
   authToken: async function (req, res, next) {
     try {
       // console.log("auth", req.cookies.auth);
-      const token = req.cookies.auth;
+      const token = req.cookies.auth || req.headers["authorization"];
+
       if (!token) {
         return res.send("Access denied");
       }
 
       const tokenInfo = verifyToken(token);
-      // console.log(tokenInfo.data);
+
       const user = await userModel.findOne({
         email: tokenInfo.data.email,
         token: token,
       });
       if (!user) res.send("Access denied!!");
+      req.user = user;
+
       next();
     } catch (error) {
       console.log(error);

@@ -21,6 +21,7 @@ const {
   addArticle,
   editArticle,
   deleteArticle,
+  getArticleByID,
 } = require("./handlers/articleHandlers");
 
 //middleware
@@ -46,7 +47,8 @@ app.post("/profile_info", authToken, getProfileInfo);
 app.patch("/user/change-password/:id", changePassword);
 
 // articlehandlers
-app.get("/article", authToken, getArticles);
+app.get("/article", getArticles);
+app.get("/article/:id", getArticleByID);
 app.post("/article/add", authToken, addArticle);
 app.put("/article/edit/:id", authToken, editArticle);
 app.delete("/article/delete/:id", authToken, deleteArticle);

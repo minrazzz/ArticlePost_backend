@@ -15,7 +15,7 @@ const generateOTP = () => {
 const getUsers = async (req, res) => {
   try {
     const users = await userModel.find();
-    console.log(users);
+    // console.log(users);
     res.json({
       user: users,
     });
@@ -92,6 +92,7 @@ const loginUser = async (req, res) => {
   user.token = token;
   await user.save();
   res.cookie("auth ", token);
+  // console.log("auth");
 
   res.json({
     success: true,
