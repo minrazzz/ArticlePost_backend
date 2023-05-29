@@ -22,6 +22,7 @@ const {
   editArticle,
   deleteArticle,
   getArticleByID,
+  addViews,
 } = require("./handlers/articleHandlers");
 
 //middleware
@@ -45,6 +46,9 @@ app.post("/profile_info", authToken, getProfileInfo);
 
 //password change
 app.patch("/user/change-password/:id", changePassword);
+
+//add-views
+app.post("/article-add-views/:id", addViews);
 
 // articlehandlers
 app.get("/article", getArticles);

@@ -1,6 +1,7 @@
 const { ArticleModel } = require("../models/Article");
 const { imageValidation, imageUpload } = require("../middleware/authenticate");
 const moment = require("moment"); // require
+var fs = require("fs");
 
 const getArticles = async (req, res) => {
   try {
@@ -16,6 +17,7 @@ const getArticles = async (req, res) => {
         author: article.author,
         author_id: article.author_id,
         image: article.image,
+        views: article.views,
         createdAt: article.createdAt,
       });
     });
@@ -106,7 +108,12 @@ const editArticle = async (req, res) => {
         return false;
       }
 
-      imageFileName = imageUpload("uploads", imageFile);
+      fs.unlink(article.image, function (error) {
+        //delete the existing image
+        console.log(error);
+      });
+
+      imageFileName = imageUpload("uploads", imageFile); //add new edited image file
       article.image = imageFileName ? "uploads/" + imageFileName : null;
     }
 
@@ -115,17 +122,6 @@ const editArticle = async (req, res) => {
     article.description = body.description;
     await article.save();
 
-    // const edit = await ArticleModel.findByIdAndUpdate(
-    //   { _id: id },
-    //   {
-    //     title: body.title,
-    //     introduction: body.introduction,
-    //     description: body.description,
-    //     author: body.author,
-    //     author_id: body.author_id,
-    //     image: imageFileName ? "uploads/" + imageFileName : null,
-    //   }
-    // );
     res.json({
       success: true,
       message: "Article edited successfully",
@@ -135,6 +131,7 @@ const editArticle = async (req, res) => {
   }
 };
 
+//Article Delete
 const deleteArticle = async (req, res) => {
   const id = req.params.id;
 
@@ -153,6 +150,11 @@ const deleteArticle = async (req, res) => {
       message: "only author can delete!!",
     });
   }
+
+  fs.unlink(article.image, function (error) {
+    //delete the existing image
+    console.log(error);
+  });
 
   const deleteArticle = await ArticleModel.findByIdAndRemove({ _id: id }); //find by id and remove
   res.json({
@@ -182,10 +184,41 @@ const getArticleByID = async (req, res) => {
   }
 };
 
+const addViews = async (req, res) => {
+  try {
+    const articleId = req.params.id;
+    const article = await ArticleModel.findById(articleId);
+    if (!article) {
+      res.json({
+        success: false,
+        data: null,
+        message: "article not found",
+      });
+      return false;
+    }
+    console.log(req.socket.remoteAddress);
+    console.log(article.viewed);
+
+    if (!article.viewed.includes(req.socket.remoteAddress)) {
+      article.views++;
+      article.viewed.push(req.socket.remoteAddress);
+    }
+    await article.save();
+
+    return res.json({
+      success: true,
+      message: "view +1",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getArticles,
   addArticle,
   editArticle,
   deleteArticle,
   getArticleByID,
+  addViews,
 };
