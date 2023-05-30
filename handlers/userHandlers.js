@@ -24,9 +24,6 @@ const getUsers = async (req, res) => {
   }
 };
 
-// POST API*      MUTATOR-database ma pathaunu vanda garne changes
-//                ACCESSor-database bata linu vanda pahile garine changes** mutator and accessor is used in models
-
 const addUser = async (req, res) => {
   try {
     const body = req.body;

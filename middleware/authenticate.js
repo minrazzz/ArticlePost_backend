@@ -8,7 +8,7 @@ module.exports = {
   authToken: async function (req, res, next) {
     try {
       // console.log("auth", req.cookies.auth);
-      const token = req.cookies.auth || req.headers["authorization"];
+      const token = req.headers["authorization"] || req.cookies.auth;
 
       if (!token) {
         return res.send("Access denied");
@@ -22,6 +22,8 @@ module.exports = {
       });
       if (!user) res.send("Access denied!!");
       req.user = user;
+      // console.log(token);
+      // console.log(user);
 
       next();
     } catch (error) {

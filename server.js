@@ -25,6 +25,7 @@ const {
   addViews,
 } = require("./handlers/articleHandlers");
 
+const { addComments, getComments } = require("./handlers/commentHandler");
 //middleware
 const { authToken } = require("./middleware/authenticate");
 
@@ -49,6 +50,10 @@ app.patch("/user/change-password/:id", changePassword);
 
 //add-views
 app.post("/article-add-views/:id", addViews);
+
+//comments
+app.post("/comments/add", authToken, addComments);
+app.get("/comments/get/:articleId", getComments);
 
 // articlehandlers
 app.get("/article", getArticles);
